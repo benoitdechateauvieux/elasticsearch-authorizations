@@ -90,10 +90,30 @@ public class ElasticTest extends ElasticsearchIntegrationTest {
 
         //When
         List<Page> pages = indexingService.search("RDBMS");
-//        Thread.sleep(2000 * 1000);
 
         //Then
         assertThat(pages.size(), is(0));
+    }
+
+    @Test
+    public void test_searchWithOwner_returnsPage() throws IOException, InterruptedException {
+        //Given
+        assertFalse(indexExists("wikipages"));
+        IndexingService indexingService = new IndexingService(cluster().httpAddresses()[0].getPort());
+        Page page = new Page();
+        page.setTitle("RDBMS Guidelines");
+        page.setAllowedUsers(new String[]{"Bob", "Alice"});
+        page.setOwner("JohnDoe");
+        indexingService.index(page);
+        Thread.sleep(2 * 1000);
+
+        //When
+        setCurrentUser("JohnDoe");
+        List<Page> pages = indexingService.search("RDBMS");
+//        Thread.sleep(2000 * 1000);
+
+        //Then
+        assertThat(pages.size(), is(1));
     }
 
     private void setCurrentUser(String userId) {

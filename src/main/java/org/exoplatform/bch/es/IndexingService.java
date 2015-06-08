@@ -9,6 +9,8 @@ import io.searchbox.core.SearchResult;
 import io.searchbox.indices.CreateIndex;
 import io.searchbox.indices.mapping.PutMapping;
 import org.exoplatform.bch.es.security.ConversationState;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.util.List;
@@ -17,6 +19,8 @@ import java.util.List;
  * Created by bdechateauvieux on 6/4/15.
  */
 public class IndexingService {
+    private static final Logger LOGGER = LoggerFactory.getLogger(IndexingService.class);
+
     private final int esPort;
     private final JestClient client;
 
@@ -33,11 +37,6 @@ public class IndexingService {
     }
 
     public List<Page> search(String query) throws IOException {
-//        String querySt = "{" +
-//                "    \"query\": {" +
-//                "       \"match\" : { \"title\" : \""+query+"\" }" +
-//                "    }" +
-//                "}";
         String querySt = "{\n" +
                 "    \"query\": {\n" +
                 "        \"filtered\" : {\n" +
@@ -45,13 +44,17 @@ public class IndexingService {
                 "                \"match\" : { \"title\" : \""+query+"\" }" +
                 "            },\n" +
                 "            \"filter\" : {\n" +
-                "               \"term\" : { " +
-        "                           \"allowedUsers\" : \""+getCurrentUser()+"\"" +
-                "              }\n"+
+                "               \"bool\" : { " +
+                "                  \"should\" : [ " +
+                "                      {\"term\" : { \"allowedUsers\" : \""+getCurrentUser()+"\" }}," +
+                "                      {\"term\" : { \"owner\" : \""+getCurrentUser()+"\" }}" +
+                "                   ]\n"+
+                "               }\n"+
                 "            }\n" +
                 "        }\n" +
                 "    }\n" +
                 "}";
+        LOGGER.debug(querySt);
 
         Search search = new Search.Builder(querySt)
                 // multiple index or types can be added.
@@ -72,8 +75,10 @@ public class IndexingService {
                 "wikipages",
                 "page",
                 "{ \"page\" : " +
-                    "{ \"properties\" : " +
-                        "{ \"allowedUsers\" : {\"type\" : \"string\", \"index\" : \"not_analyzed\"} }" +
+                    "{ \"properties\" : {" +
+                        "\"allowedUsers\" : {\"type\" : \"string\", \"index\" : \"not_analyzed\"} ," +
+                        "\"owner\" : {\"type\" : \"string\", \"index\" : \"not_analyzed\"} " +
+                        "}" +
                     "} " +
                 "}"
         ).build();

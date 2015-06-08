@@ -11,6 +11,15 @@ public class Page {
     private String title;
     private String[] allowedUsers;
     private String[] allowedRoles;
+    private String owner;
+
+    public String getOwner() {
+        return owner;
+    }
+
+    public void setOwner(String owner) {
+        this.owner = owner;
+    }
 
     public String[] getAllowedUsers() {
         return allowedUsers;
