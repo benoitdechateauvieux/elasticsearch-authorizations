@@ -46,7 +46,7 @@ public class IndexingService {
                 "            \"filter\" : {\n" +
                 "               \"bool\" : { " +
                 "                  \"should\" : [ " +
-                "                      {\"term\" : { \"allowedUsers\" : \""+getCurrentUser()+"\" }}," +
+                "                      {\"term\" : { \"allowedIdentities\" : \""+getCurrentUser()+"\" }}," +
                 "                      {\"term\" : { \"owner\" : \""+getCurrentUser()+"\" }}" +
                 "                   ]\n"+
                 "               }\n"+
@@ -76,7 +76,7 @@ public class IndexingService {
                 "page",
                 "{ \"page\" : " +
                     "{ \"properties\" : {" +
-                        "\"allowedUsers\" : {\"type\" : \"string\", \"index\" : \"not_analyzed\"} ," +
+                        "\"allowedIdentities\" : {\"type\" : \"string\", \"index\" : \"not_analyzed\"} ," +
                         "\"owner\" : {\"type\" : \"string\", \"index\" : \"not_analyzed\"} " +
                         "}" +
                     "} " +

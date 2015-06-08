@@ -9,8 +9,7 @@ public class Page {
     @JestId
     private String id = Long.toString(System.currentTimeMillis()); // Default Id
     private String title;
-    private String[] allowedUsers;
-    private String[] allowedRoles;
+    private String[] allowedIdentities;
     private String owner;
 
     public String getOwner() {
@@ -21,20 +20,12 @@ public class Page {
         this.owner = owner;
     }
 
-    public String[] getAllowedUsers() {
-        return allowedUsers;
+    public String[] getAllowedIdentities() {
+        return allowedIdentities;
     }
 
-    public void setAllowedUsers(String[] allowedUsers) {
-        this.allowedUsers = allowedUsers;
-    }
-
-    public String[] getAllowedRoles() {
-        return allowedRoles;
-    }
-
-    public void setAllowedRoles(String[] allowedRoles) {
-        this.allowedRoles = allowedRoles;
+    public void setAllowedIdentities(String[] allowedIdentities) {
+        this.allowedIdentities = allowedIdentities;
     }
 
     public void setTitle(String title) {

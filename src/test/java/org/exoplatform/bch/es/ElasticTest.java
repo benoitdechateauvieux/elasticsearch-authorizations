@@ -66,7 +66,7 @@ public class ElasticTest extends ElasticsearchIntegrationTest {
         IndexingService indexingService = new IndexingService(cluster().httpAddresses()[0].getPort());
         Page page = new Page();
         page.setTitle("RDBMS Guidelines");
-        page.setAllowedUsers(new String[]{"Alice"});
+        page.setAllowedIdentities(new String[]{"Alice"});
         indexingService.index(page);
         Thread.sleep(2 * 1000);
 
@@ -84,7 +84,7 @@ public class ElasticTest extends ElasticsearchIntegrationTest {
         IndexingService indexingService = new IndexingService(cluster().httpAddresses()[0].getPort());
         Page page = new Page();
         page.setTitle("RDBMS Guidelines");
-        page.setAllowedUsers(new String[]{"Bob"});
+        page.setAllowedIdentities(new String[]{"Bob"});
         indexingService.index(page);
         Thread.sleep(2 * 1000);
 
@@ -102,7 +102,7 @@ public class ElasticTest extends ElasticsearchIntegrationTest {
         IndexingService indexingService = new IndexingService(cluster().httpAddresses()[0].getPort());
         Page page = new Page();
         page.setTitle("RDBMS Guidelines");
-        page.setAllowedUsers(new String[]{"Bob", "Alice"});
+        page.setAllowedIdentities(new String[]{"Bob", "Alice"});
         page.setOwner("JohnDoe");
         indexingService.index(page);
         Thread.sleep(2 * 1000);

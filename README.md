@@ -33,4 +33,4 @@ In eXo, ACL can be inherited.
 In the search engine, ACL are de-normalized: the ACL for a given node is computed when indexing the document. 
 
 ## Important notes
-AllowedUsers and AllowedRoles have to be indexed as "not_analyzed".
+allowedIdentities and owner have to be indexed as "not_analyzed".
