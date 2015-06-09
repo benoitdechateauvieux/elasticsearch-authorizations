@@ -78,11 +78,9 @@ public class IndexingService {
 
     private String getFilterForMembership() {
         StringBuilder result = new StringBuilder();
-        for (String wildCardMS : getMemberships()) {
-            result.append("{\"regexp\" : { ");
-            result.append("     \"allowedIdentities\" : \"" + wildCardMS + "\" ");
-            result.append("}},");
-        }
+        result.append("{\"regexp\" : { ");
+        result.append("     \"allowedIdentities\" : \"" + StringUtils.join(getMemberships(), "|") + "\" ");
+        result.append("}},");
         return result.toString();
     }
 

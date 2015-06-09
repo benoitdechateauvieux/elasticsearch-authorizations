@@ -180,6 +180,66 @@ public class ElasticTest extends ElasticsearchIntegrationTest {
         assertThat(pages.size(), is(docFound?1:0));
     }
 
+    @Test
+    public void test_moreThanOneMembership_found() throws IOException, InterruptedException {
+        test_moreThanOneMembership("dev:/pub", true, "dev:/pub", "*:/users", "*:/admin");
+    }
+
+    @Test
+    public void test_moreThanOneMembership_notfound() throws IOException, InterruptedException {
+        test_moreThanOneMembership("admin:/pub", false, "dev:/pub", "*:/users", "*:/admin");
+    }
+
+    @Test
+    public void test_moreThanOnePermission_found() throws IOException, InterruptedException {
+        test_moreThanOnePermission("dev:/pub", true, "dev:/pub", "*:/users", "*:/admin");
+    }
+
+    @Test
+    public void test_moreThanOnePermission_notfound() throws IOException, InterruptedException {
+        test_moreThanOnePermission("admin:/pub", false, "dev:/pub", "*:/users", "*:/admin");
+    }
+
+    private void test_moreThanOneMembership(String permission, boolean docFound, String... membership)
+            throws IOException, InterruptedException {
+        //Given
+        assertFalse(indexExists("wikipages"));
+        IndexingService indexingService = new IndexingService(cluster().httpAddresses()[0].getPort());
+        Page page = new Page();
+        page.setTitle("RDBMS Guidelines");
+        page.setAllowedIdentities(new String[]{permission});
+        page.setOwner("JohnDoe");
+        indexingService.index(page);
+        Thread.sleep(2 * 1000);
+
+        //When
+        setCurrentUser("JaneDoe", membership);
+        List<Page> pages = indexingService.search("RDBMS");
+
+        //Then
+        assertThat(pages.size(), is(docFound?1:0));
+    }
+
+    private void test_moreThanOnePermission(String membership, boolean docFound, String... permissions)
+            throws IOException, InterruptedException {
+        //Given
+        assertFalse(indexExists("wikipages"));
+        IndexingService indexingService = new IndexingService(cluster().httpAddresses()[0].getPort());
+        Page page = new Page();
+        page.setTitle("RDBMS Guidelines");
+        page.setAllowedIdentities(permissions);
+        page.setOwner("JohnDoe");
+        indexingService.index(page);
+        Thread.sleep(2 * 1000);
+
+        //When
+        setCurrentUser("JaneDoe", membership);
+        List<Page> pages = indexingService.search("RDBMS");
+
+        //Then
+        assertThat(pages.size(), is(docFound?1:0));
+    }
+
     /**
      * Configuration of the ES integration tests
      */
