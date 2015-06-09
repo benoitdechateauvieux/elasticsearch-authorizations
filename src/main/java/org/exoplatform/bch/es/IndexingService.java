@@ -8,12 +8,16 @@ import io.searchbox.core.Search;
 import io.searchbox.core.SearchResult;
 import io.searchbox.indices.CreateIndex;
 import io.searchbox.indices.mapping.PutMapping;
+import org.apache.commons.lang3.StringUtils;
 import org.exoplatform.bch.es.security.ConversationState;
+import org.exoplatform.bch.es.security.MembershipEntry;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Created by bdechateauvieux on 6/4/15.
@@ -46,8 +50,9 @@ public class IndexingService {
                 "            \"filter\" : {\n" +
                 "               \"bool\" : { " +
                 "                  \"should\" : [ " +
-                "                      {\"term\" : { \"allowedIdentities\" : \""+getCurrentUser()+"\" }}," +
-                "                      {\"term\" : { \"owner\" : \""+getCurrentUser()+"\" }}" +
+                                        getFilterForCurrentUser()+
+                                        getFilterForMembership()+
+                                        getFilterForOwner()+
                 "                   ]\n"+
                 "               }\n"+
                 "            }\n" +
@@ -65,6 +70,24 @@ public class IndexingService {
 //        List<SearchResult.Hit<Page, Void>> hits = result.getHits(Page.class);
 // or
         return result.getSourceAsObjectList(Page.class);
+    }
+
+    private String getFilterForOwner() {
+        return "{\"term\" : { \"owner\" : \""+getCurrentUser()+"\" }}";
+    }
+
+    private String getFilterForMembership() {
+        StringBuilder result = new StringBuilder();
+        for (String wildCardMS : getMemberships()) {
+            result.append("{\"regexp\" : { ");
+            result.append("     \"allowedIdentities\" : \"" + wildCardMS + "\" ");
+            result.append("}},");
+        }
+        return result.toString();
+    }
+
+    private String getFilterForCurrentUser() {
+        return "{\"term\" : { \"allowedIdentities\" : \""+getCurrentUser()+"\" }},";
     }
 
     public void index(Page page) throws IOException {
@@ -88,10 +111,33 @@ public class IndexingService {
         this.client.execute(index);
     }
 
-    public static String getCurrentUser() {
+    public String getCurrentUser() {
         ConversationState conversationState = ConversationState.getCurrent();
         if (conversationState != null) {
             return ConversationState.getCurrent().getIdentity().getUserId();
+        }
+        return null;
+    }
+
+    private Set<String> getMemberships() {
+        ConversationState conversationState = ConversationState.getCurrent();
+        if (conversationState != null) {
+            Set<String> entries = new HashSet<>();
+            for (MembershipEntry entry : ConversationState.getCurrent().getIdentity().getMemberships()) {
+                //If it's a wildcard membership, add a point to transform it to regexp
+                if (entry.getMembershipType().equals(MembershipEntry.ANY_TYPE)) {
+                    entries.add(entry.toString().replace("*", ".*"));
+                }
+                //If it's not a wildcard membership
+                else {
+                    //Add the membership
+                    entries.add(entry.toString());
+                    //Also add a wildcard membership (not as a regexp) in order to match to wildcard permission
+                    //Ex: membership dev:/pub must match permission dev:/pub and permission *:/pub
+                    entries.add("*:"+entry.getGroup());
+                }
+            }
+            return entries;
         }
         return null;
     }

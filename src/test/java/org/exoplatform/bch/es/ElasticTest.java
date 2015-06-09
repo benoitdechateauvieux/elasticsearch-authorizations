@@ -7,14 +7,13 @@ import org.elasticsearch.indices.IndexMissingException;
 import org.elasticsearch.node.internal.InternalNode;
 import org.elasticsearch.rest.RestController;
 import org.elasticsearch.test.ElasticsearchIntegrationTest;
-import org.exoplatform.bch.es.security.ConversationState;
-import org.exoplatform.bch.es.security.Identity;
 import org.junit.Before;
 import org.junit.Test;
 
 import java.io.IOException;
 import java.util.List;
 
+import static org.exoplatform.bch.es.SecurityUtils.setCurrentUser;
 import static org.hamcrest.CoreMatchers.is;
 
 /**
@@ -110,14 +109,75 @@ public class ElasticTest extends ElasticsearchIntegrationTest {
         //When
         setCurrentUser("JohnDoe");
         List<Page> pages = indexingService.search("RDBMS");
-//        Thread.sleep(2000 * 1000);
 
         //Then
         assertThat(pages.size(), is(1));
     }
 
-    private void setCurrentUser(String userId) {
-        ConversationState.setCurrent(new ConversationState(new Identity(userId)));
+    @Test
+    public void test_searchWithMembership_returnsPage() throws IOException, InterruptedException {
+        //Given
+        assertFalse(indexExists("wikipages"));
+        IndexingService indexingService = new IndexingService(cluster().httpAddresses()[0].getPort());
+        Page page = new Page();
+        page.setTitle("RDBMS Guidelines");
+        page.setAllowedIdentities(new String[]{"Bob", "Alice", "publisher:/developers"});
+        page.setOwner("JohnDoe");
+        indexingService.index(page);
+        Thread.sleep(2 * 1000);
+
+        //When
+        setCurrentUser("JaneDoe", "publisher:/developers");
+        List<Page> pages = indexingService.search("RDBMS");
+
+        //Then
+        assertThat(pages.size(), is(1));
+    }
+
+    @Test
+    public void test_membership_dev_dev() throws IOException, InterruptedException {
+        test_searchWithSingleMembership_returnsPage("dev:/pub", "dev:/pub", true);
+    }
+
+    @Test
+    public void test_membership_star_dev() throws IOException, InterruptedException {
+        test_searchWithSingleMembership_returnsPage("*:/pub", "dev:/pub", true);
+    }
+
+    @Test
+    public void test_membership_dev_star() throws IOException, InterruptedException {
+        test_searchWithSingleMembership_returnsPage("dev:/pub", "*:/pub", true);
+    }
+
+    @Test
+    public void test_membership_xxx_dev() throws IOException, InterruptedException {
+        test_searchWithSingleMembership_returnsPage("xxx:/pub", "dev:/pub", false);
+    }
+
+    @Test
+    public void test_membership_dev_xxx() throws IOException, InterruptedException {
+        test_searchWithSingleMembership_returnsPage("dev:/pub", "xxx:/pub", false);
+    }
+
+    private void test_searchWithSingleMembership_returnsPage(String membership, String permission, boolean docFound)
+    throws IOException, InterruptedException {
+        //Given
+        assertFalse(indexExists("wikipages"));
+        IndexingService indexingService = new IndexingService(cluster().httpAddresses()[0].getPort());
+        Page page = new Page();
+        page.setTitle("RDBMS Guidelines");
+        page.setAllowedIdentities(new String[]{permission});
+        page.setOwner("JohnDoe");
+        indexingService.index(page);
+        Thread.sleep(2 * 1000);
+
+        //When
+        setCurrentUser("JaneDoe", membership);
+        List<Page> pages = indexingService.search("RDBMS");
+//        Thread.sleep(2000 * 1000);
+
+        //Then
+        assertThat(pages.size(), is(docFound?1:0));
     }
 
     /**
