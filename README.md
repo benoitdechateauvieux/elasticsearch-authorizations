@@ -8,9 +8,9 @@ Each search is executed by a Principal (the principal is an authenticated user o
 The identity is a string identifying this group or user.
 
 There are 3 reserved identities in eXo Platform:
-1. **any** : represents any authenticated session.
-2. **anonim** : represents a principal for non authenticated sessions. (No error, it's really "anonim").
-3. **system** : represents a principal for system sessions, typically used for administrative purposes. 
+* **any** : represents any authenticated session.
+* **anonim** : represents a principal for non authenticated sessions. (No error, it's really "anonim").
+* **system** : represents a principal for system sessions, typically used for administrative purposes. 
 System session has full access (all permissions) to all nodes.
 
 ### Owner and privileges
