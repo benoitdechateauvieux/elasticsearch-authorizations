@@ -65,7 +65,7 @@ public class ElasticTest extends ElasticsearchIntegrationTest {
         IndexingService indexingService = new IndexingService(cluster().httpAddresses()[0].getPort());
         Page page = new Page();
         page.setTitle("RDBMS Guidelines");
-        page.setAllowedIdentities(new String[]{"Alice"});
+        page.setPermissions(new String[]{"Alice"});
         indexingService.index(page);
         Thread.sleep(2 * 1000);
 
@@ -83,7 +83,7 @@ public class ElasticTest extends ElasticsearchIntegrationTest {
         IndexingService indexingService = new IndexingService(cluster().httpAddresses()[0].getPort());
         Page page = new Page();
         page.setTitle("RDBMS Guidelines");
-        page.setAllowedIdentities(new String[]{"Bob"});
+        page.setPermissions(new String[]{"Bob"});
         indexingService.index(page);
         Thread.sleep(2 * 1000);
 
@@ -101,8 +101,7 @@ public class ElasticTest extends ElasticsearchIntegrationTest {
         IndexingService indexingService = new IndexingService(cluster().httpAddresses()[0].getPort());
         Page page = new Page();
         page.setTitle("RDBMS Guidelines");
-        page.setAllowedIdentities(new String[]{"Bob", "Alice"});
-        page.setOwner("JohnDoe");
+        page.setPermissions(new String[]{"Bob", "JohnDoe", "Alice"}); //Owner is added in permissions field
         indexingService.index(page);
         Thread.sleep(2 * 1000);
 
@@ -121,8 +120,7 @@ public class ElasticTest extends ElasticsearchIntegrationTest {
         IndexingService indexingService = new IndexingService(cluster().httpAddresses()[0].getPort());
         Page page = new Page();
         page.setTitle("RDBMS Guidelines");
-        page.setAllowedIdentities(new String[]{"Bob", "Alice", "publisher:/developers"});
-        page.setOwner("JohnDoe");
+        page.setPermissions(new String[]{"Bob", "Alice", "publisher:/developers"});
         indexingService.index(page);
         Thread.sleep(2 * 1000);
 
@@ -166,8 +164,7 @@ public class ElasticTest extends ElasticsearchIntegrationTest {
         IndexingService indexingService = new IndexingService(cluster().httpAddresses()[0].getPort());
         Page page = new Page();
         page.setTitle("RDBMS Guidelines");
-        page.setAllowedIdentities(new String[]{permission});
-        page.setOwner("JohnDoe");
+        page.setPermissions(new String[]{permission});
         indexingService.index(page);
         Thread.sleep(2 * 1000);
 
@@ -207,8 +204,7 @@ public class ElasticTest extends ElasticsearchIntegrationTest {
         IndexingService indexingService = new IndexingService(cluster().httpAddresses()[0].getPort());
         Page page = new Page();
         page.setTitle("RDBMS Guidelines");
-        page.setAllowedIdentities(new String[]{permission});
-        page.setOwner("JohnDoe");
+        page.setPermissions(new String[]{permission});
         indexingService.index(page);
         Thread.sleep(2 * 1000);
 
@@ -227,8 +223,7 @@ public class ElasticTest extends ElasticsearchIntegrationTest {
         IndexingService indexingService = new IndexingService(cluster().httpAddresses()[0].getPort());
         Page page = new Page();
         page.setTitle("RDBMS Guidelines");
-        page.setAllowedIdentities(permissions);
-        page.setOwner("JohnDoe");
+        page.setPermissions(permissions);
         indexingService.index(page);
         Thread.sleep(2 * 1000);
 

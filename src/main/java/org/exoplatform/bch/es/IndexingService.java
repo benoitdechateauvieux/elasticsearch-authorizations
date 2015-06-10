@@ -52,7 +52,7 @@ public class IndexingService {
                 "                  \"should\" : [ " +
                                         getFilterForCurrentUser()+
                                         getFilterForMembership()+
-                                        getFilterForOwner()+
+
                 "                   ]\n"+
                 "               }\n"+
                 "            }\n" +
@@ -72,20 +72,16 @@ public class IndexingService {
         return result.getSourceAsObjectList(Page.class);
     }
 
-    private String getFilterForOwner() {
-        return "{\"term\" : { \"owner\" : \""+getCurrentUser()+"\" }}";
-    }
-
     private String getFilterForMembership() {
         StringBuilder result = new StringBuilder();
         result.append("{\"regexp\" : { ");
-        result.append("     \"allowedIdentities\" : \"" + StringUtils.join(getMemberships(), "|") + "\" ");
-        result.append("}},");
+        result.append("     \"permissions\" : \"" + StringUtils.join(getMemberships(), "|") + "\" ");
+        result.append("}}");
         return result.toString();
     }
 
     private String getFilterForCurrentUser() {
-        return "{\"term\" : { \"allowedIdentities\" : \""+getCurrentUser()+"\" }},";
+        return "{\"term\" : { \"permissions\" : \""+getCurrentUser()+"\" }},";
     }
 
     public void index(Page page) throws IOException {
@@ -97,8 +93,7 @@ public class IndexingService {
                 "page",
                 "{ \"page\" : " +
                     "{ \"properties\" : {" +
-                        "\"allowedIdentities\" : {\"type\" : \"string\", \"index\" : \"not_analyzed\"} ," +
-                        "\"owner\" : {\"type\" : \"string\", \"index\" : \"not_analyzed\"} " +
+                        "\"permissions\" : {\"type\" : \"string\", \"index\" : \"not_analyzed\"}" +
                         "}" +
                     "} " +
                 "}"

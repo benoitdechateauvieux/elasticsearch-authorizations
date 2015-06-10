@@ -20,6 +20,8 @@ The privileges are defined as (positive) permissions that are granted to users o
 * **Ownable** : The node (wiki, wiki page, attachment) has an owner.
 The owner has always full access (all permissions) to the node, independent of the privilegeable facet.
 
+**=> In the context of search, the ownership is treated like a permission.**
+
 ### Permission type
 The possible values of the Permission type are corresponding to JCR standard actions:
 * **read**: The node or its properties can be read.
@@ -34,4 +36,4 @@ In eXo, ACL can be inherited.
 In the search engine, ACL are de-normalized: the ACL for a given node is computed when indexing the document. 
 
 ## Important notes
-allowedIdentities and owner have to be indexed as "not_analyzed".
+Permissions field has to be indexed as "not_analyzed".

@@ -9,23 +9,14 @@ public class Page {
     @JestId
     private String id = Long.toString(System.currentTimeMillis()); // Default Id
     private String title;
-    private String[] allowedIdentities;
-    private String owner;
+    private String[] permissions;
 
-    public String getOwner() {
-        return owner;
+    public String[] getPermissions() {
+        return permissions;
     }
 
-    public void setOwner(String owner) {
-        this.owner = owner;
-    }
-
-    public String[] getAllowedIdentities() {
-        return allowedIdentities;
-    }
-
-    public void setAllowedIdentities(String[] allowedIdentities) {
-        this.allowedIdentities = allowedIdentities;
+    public void setPermissions(String[] permissions) {
+        this.permissions = permissions;
     }
 
     public void setTitle(String title) {
