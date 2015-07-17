@@ -35,3 +35,13 @@ In the search engine, ACL are de-normalized: the ACL for a given node is compute
 
 ## Important notes
 allowedIdentities and owner have to be indexed as "not_analyzed".
+
+## How to run the webapp ?
+```Maven
+mvn tomcat7:run
+```
+
+## How to test ?
+```Maven
+mvn clean test
+```
